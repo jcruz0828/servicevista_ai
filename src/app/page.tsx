@@ -328,7 +328,23 @@ function useCountUp(end: number, duration: number = 2000) {
 function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: string, suffix?: string, prefix?: string }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
-  const numericValue = parseInt(value.replace(/[^\d]/g, ''));
+  
+  // Better parsing logic to handle decimals and suffixes
+  const parseValue = (val: string) => {
+    const cleanValue = val.replace(/[^\d.]/g, ''); // Keep digits and decimal points
+    const numericBase = parseFloat(cleanValue) || 0;
+    
+    if (val.includes('M')) {
+      return Math.floor(numericBase * 1000000);
+    } else if (val.includes('K')) {
+      return Math.floor(numericBase * 1000);
+    } else if (val.includes(',')) {
+      return parseInt(val.replace(/[^\d]/g, '')) || 0;
+    }
+    return Math.floor(numericBase);
+  };
+  
+  const numericValue = parseValue(value);
   const { count, startCountUp } = useCountUp(numericValue);
 
   useEffect(() => {
@@ -338,9 +354,18 @@ function AnimatedCounter({ value, suffix = '', prefix = '' }: { value: string, s
   }, [isInView, startCountUp]);
 
   const formatCount = (num: number) => {
-    if (value.includes('M')) return `${(num / 1000000).toFixed(1)}M`;
-    if (value.includes('K')) return `${(num / 1000).toFixed(0)}K`;
-    if (value.includes(',')) return num.toLocaleString();
+    if (value.includes('M')) {
+      return `${(num / 1000000).toFixed(1)}M${value.includes('+') ? '+' : ''}`;
+    }
+    if (value.includes('K')) {
+      return `${(num / 1000).toFixed(0)}K${value.includes('+') ? '+' : ''}`;
+    }
+    if (value.includes('%')) {
+      return `${num.toFixed(1)}%`;
+    }
+    if (value.includes(',')) {
+      return `${num.toLocaleString()}${value.includes('+') ? '+' : ''}`;
+    }
     return num.toString();
   };
 
@@ -574,7 +599,7 @@ export default function HomePage() {
                 className="group"
               >
                 <Card className="h-full text-center hover:shadow-xl transition-all duration-300 border-slate-200 group-hover:border-blue-200">
-                  <CardContent className="p-8 h-full flex flex-col">
+                  <CardContent className="p-8 h-full flex flex-col mt-4">
                     <motion.div
                       className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 text-blue-600 rounded-lg mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300"
                       whileHover={{ rotate: 360 }}
