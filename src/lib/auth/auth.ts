@@ -90,6 +90,7 @@ export const MOCK_USERS: User[] = [
 export class AuthService {
   private static currentUser: User | null = null;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   static async login(email: string, password: string): Promise<AuthSession | null> {
     // Mock authentication - in real app, this would validate against backend
     const user = MOCK_USERS.find(u => u.email === email && u.isActive);

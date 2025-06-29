@@ -473,7 +473,8 @@ export default function AboutPage() {
           <div className="relative">
             {/* Timeline line */}
             <motion.div
-              className="absolute left-8 top-0 bottom-0 w-px bg-blue-200"
+              className="absolute left-8 top-0 w-px bg-blue-200"
+              style={{ height: 'calc(100% - 4rem)' }}
               initial={{ scaleY: 0 }}
               whileInView={{ scaleY: 1 }}
               viewport={{ once: true }}
